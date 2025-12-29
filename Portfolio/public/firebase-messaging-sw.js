@@ -2,14 +2,14 @@
 
 // Firebase Cloud Messaging Service Worker
 // Notes:
-// - In production (Firebase Hosting), this uses /__/firebase/init.js for config.
-// - In local dev, we accept firebaseConfig via a dev-only query param during SW registration.
+// - On GitHub Pages (or any static hosting), we initialize from a config query param during SW registration.
+// - On Firebase Hosting, we can also use /__/firebase/init.js.
 
 importScripts('https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging-compat.js');
 
 (async () => {
-  const parseDevConfig = () => {
+  const parseConfig = () => {
     try {
       const url = new URL(self.location.href)
       const encoded = url.searchParams.get('config')
@@ -23,13 +23,15 @@ importScripts('https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging-com
     }
   }
 
-  try {
-    // Works on Firebase Hosting (recommended)
-    importScripts('/__/firebase/init.js');
-  } catch (e) {
-    const devConfig = parseDevConfig()
-    if (devConfig) {
-      firebase.initializeApp(devConfig)
+  const cfg = parseConfig()
+  if (cfg) {
+    firebase.initializeApp(cfg)
+  } else {
+    try {
+      // Works on Firebase Hosting
+      importScripts('/__/firebase/init.js');
+    } catch {
+      // ignore
     }
   }
 

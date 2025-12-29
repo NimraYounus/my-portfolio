@@ -48,8 +48,11 @@ export default function NotificationTokenAdmin() {
       })
 
       const configEncoded = btoa(unescape(encodeURIComponent(configJson)))
-      const swUrl = `/firebase-messaging-sw.js?config=${encodeURIComponent(configEncoded)}`
-      const registration = await navigator.serviceWorker.register(swUrl)
+      const swUrl = `${window.location.origin}${import.meta.env.BASE_URL}firebase-messaging-sw.js?config=${encodeURIComponent(configEncoded)}`
+
+      const registration = await navigator.serviceWorker.register(swUrl, {
+        scope: import.meta.env.BASE_URL,
+      })
 
       const fcmToken = await getToken(messaging, {
         vapidKey,
@@ -83,7 +86,7 @@ export default function NotificationTokenAdmin() {
     <div className="mt-8 rounded-xl border border-[#a78bfa]/20 bg-[#120727]/40 p-5">
       <div className="text-[12px] font-semibold tracking-widest text-[#a78bfa]">ADMIN • FCM TOKEN</div>
       <div className="mt-2 text-[12px] leading-5 text-white/70">
-        Enable Firebase Web Push for Chrome (Android/Desktop). This panel is shown only in dev mode.
+        Enable Firebase Web Push for Chrome (Android/Desktop).
       </div>
 
       <div className="mt-4">

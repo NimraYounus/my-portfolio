@@ -142,7 +142,9 @@ export default function ContactSection() {
           </div>
         </form>
 
-        {import.meta.env.DEV ? <NotificationTokenAdmin /> : null}
+        {import.meta.env.DEV || import.meta.env.VITE_SHOW_NOTIFICATION_ADMIN === 'true' ? (
+          <NotificationTokenAdmin />
+        ) : null}
       </div>
     </section>
   )
