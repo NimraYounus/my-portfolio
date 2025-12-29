@@ -18,14 +18,18 @@ service cloud.firestore {
         && request.resource.data.email is string
         && request.resource.data.company is string
         && request.resource.data.message is string
-        && (request.resource.data.createdAt is timestamp || request.resource.data.createdAt == request.time);
+        && (!('createdAt' in request.resource.data)
+          || request.resource.data.createdAt is timestamp
+          || request.resource.data.createdAt == request.time);
       allow update, delete: if false;
     }
 
     match /notificationTokens/{deviceId} {
       allow read: if false;
       allow create, update: if request.resource.data.token is string
-        && (request.resource.data.updatedAt is timestamp || request.resource.data.updatedAt == request.time);
+        && (!('updatedAt' in request.resource.data)
+          || request.resource.data.updatedAt is timestamp
+          || request.resource.data.updatedAt == request.time);
       allow delete: if false;
     }
   }
