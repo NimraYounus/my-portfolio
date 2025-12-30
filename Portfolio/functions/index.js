@@ -2,10 +2,6 @@ import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import { initializeApp } from 'firebase-admin/app';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
-import sgMail from '@sendgrid/mail';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 initializeApp();
 
@@ -29,6 +25,7 @@ export const onContactMessageCreated = onDocumentCreated('contactMessages/{messa
   result.email.attempted = true;
   if (sendgridApiKey && toEmail && fromEmail) {
     try {
+      const { default: sgMail } = await import('@sendgrid/mail');
       sgMail.setApiKey(sendgridApiKey);
 
       const subject = `New portfolio contact: ${data?.name || ''} (${data?.company || ''})`;

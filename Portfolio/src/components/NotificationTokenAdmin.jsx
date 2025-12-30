@@ -74,7 +74,6 @@ export default function NotificationTokenAdmin() {
       if (!messaging) {
         throw new Error('Firebase messaging is not supported in this environment.')
       }
-    // "node": ">=18.0.0"
 
       const configJson = JSON.stringify({
         apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
