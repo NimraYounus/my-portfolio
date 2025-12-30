@@ -4,6 +4,43 @@ import { useState } from 'react'
 
 import { db, getMessagingIfSupported } from '../lib/firebase'
 
+function waitForActiveServiceWorker(registration) {
+  if (registration?.active) return Promise.resolve(registration)
+
+  return new Promise((resolve, reject) => {
+    const timeoutMs = 15000
+    const startedAt = Date.now()
+
+    const tick = () => {
+      if (registration?.active) {
+        resolve(registration)
+        return
+      }
+
+      const worker = registration?.installing || registration?.waiting
+      if (worker) {
+        const onStateChange = () => {
+          if (registration?.active) {
+            worker.removeEventListener('statechange', onStateChange)
+            resolve(registration)
+          }
+        }
+
+        worker.addEventListener('statechange', onStateChange)
+      }
+
+      if (Date.now() - startedAt > timeoutMs) {
+        reject(new Error('Service worker did not activate in time. Please refresh the page and try again.'))
+        return
+      }
+
+      setTimeout(tick, 250)
+    }
+
+    tick()
+  })
+}
+
 export default function NotificationTokenAdmin() {
   const [token, setToken] = useState('')
   const [status, setStatus] = useState('idle')
@@ -53,6 +90,8 @@ export default function NotificationTokenAdmin() {
       const registration = await navigator.serviceWorker.register(swUrl, {
         scope: import.meta.env.BASE_URL,
       })
+
+      await waitForActiveServiceWorker(registration)
 
       const fcmToken = await getToken(messaging, {
         vapidKey,
